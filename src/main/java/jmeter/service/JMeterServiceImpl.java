@@ -54,8 +54,8 @@ public class JMeterServiceImpl implements JMeterService {
     @Override
     public void run( StandardJMeterEngine engine, HashTree testPlanTree ) {
         engine.configure( testPlanTree );
-        engine.run();
         LOGGER.info( "Running test plan " + testPlanTree.getArray()[0]);
+        engine.run();
     }
 
 
