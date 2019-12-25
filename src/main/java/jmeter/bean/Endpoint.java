@@ -28,8 +28,14 @@ public class Endpoint {
     @XmlElement(name = "method")
     private String method;
 
-    @XmlAttribute(name = "responseCode")
-    private int responseCode;
+    @XmlElement(name = "assertions")
+    private AssertionsBean assertions;
+
+    @XmlAttribute(name = "connectTimeout")
+    private String connectTimeout;
+
+    @XmlAttribute(name = "responseTimeout")
+    private String responseTimeout;
 
     public String getId() {
         return id;
@@ -79,11 +85,27 @@ public class Endpoint {
         this.method = method;
     }
 
-    public int getResponseCode() {
-        return responseCode;
+    public AssertionsBean getAssertions() {
+        return assertions;
     }
 
-    public void setResponseCode( int responseCode ) {
-        this.responseCode = responseCode;
+    public void setAssertions( AssertionsBean assertions ) {
+        this.assertions = assertions;
+    }
+
+    public String getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setConnectTimeout( String connectTimeout ) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public String getResponseTimeout() {
+        return responseTimeout;
+    }
+
+    public void setResponseTimeout( String responseTimeout ) {
+        this.responseTimeout = responseTimeout;
     }
 }

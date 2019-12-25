@@ -8,11 +8,21 @@
         <method>GET</method>
     </endpoint>
     
-    <endpoint id="222">
+    <endpoint id="222" connectTimeout="4000" responseTimeout="7000">
         <domain>jsonplaceholder.typicode.com</domain>
         <port>80</port>
         <path>/posts</path>
         <method>POST</method>
+        <assertions>
+            
+            <assertion>
+                <testString>200</testString>
+                <responseField>RESPONSE_CODE</responseField>
+                <responsePatternType>EQUALS</responsePatternType>
+                <not>false</not>
+            </assertion>
+            
+        </assertions>
     </endpoint>
 
     <endpoint id="333">
