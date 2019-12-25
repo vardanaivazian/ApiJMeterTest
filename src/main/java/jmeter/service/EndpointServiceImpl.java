@@ -19,7 +19,8 @@ public class EndpointServiceImpl implements EndpointService {
     private List<Endpoint> cacheEndpoints;
     
     public List<Endpoint> getEndpoints() {
-        if( !cacheEndpoints.isEmpty() ) return cacheEndpoints; 
+        // TODO: 12/25/2019 at the moment endpoints caching is useless 
+//        if( cacheEndpoints != null && !cacheEndpoints.isEmpty() ) return cacheEndpoints; 
         try {
             File file = new File(PropertyService.INSTANCE.get( "endpoints.path" ));
             JAXBContext jaxbContext = JAXBContext.newInstance( Endpoints.class);

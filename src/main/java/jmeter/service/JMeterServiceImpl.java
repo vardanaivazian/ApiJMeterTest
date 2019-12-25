@@ -1,6 +1,11 @@
 package jmeter.service;
 
+import jmeter.bean.AssertionBean;
+import jmeter.bean.ResponseField;
+import jmeter.bean.ResponsePatternType;
 import jmeter.exception.AppException;
+import org.apache.jmeter.assertions.ResponseAssertion;
+import org.apache.jmeter.assertions.gui.AssertionGui;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.config.gui.ArgumentsPanel;
 import org.apache.jmeter.control.LoopController;
@@ -72,8 +77,8 @@ public class JMeterServiceImpl implements JMeterService {
         loopController.setLoops( loopCount );
         loopController.setFirst( first );
         loopController.initialize();
-        loopController.setProperty(TestElement.TEST_CLASS, LoopController.class.getName());
-        loopController.setProperty(TestElement.GUI_CLASS, LoopControlPanel.class.getName());
+        loopController.setProperty( TestElement.TEST_CLASS, LoopController.class.getName() );
+        loopController.setProperty( TestElement.GUI_CLASS, LoopControlPanel.class.getName() );
         return loopController;
     }
 
@@ -83,17 +88,17 @@ public class JMeterServiceImpl implements JMeterService {
         threadGroup.setName( name );
         threadGroup.setNumThreads( numThreads );
         threadGroup.setRampUp( rumpUp );
-        threadGroup.setProperty(TestElement.TEST_CLASS, ThreadGroup.class.getName());
-        threadGroup.setProperty(TestElement.GUI_CLASS, ThreadGroupGui.class.getName());
+        threadGroup.setProperty( TestElement.TEST_CLASS, ThreadGroup.class.getName() );
+        threadGroup.setProperty( TestElement.GUI_CLASS, ThreadGroupGui.class.getName() );
         return threadGroup;
     }
 
     @Override
     public TestPlan testPlan( String name ) {
         TestPlan testPlan = new TestPlan( name );
-        testPlan.setProperty(TestElement.TEST_CLASS, TestPlan.class.getName());
-        testPlan.setProperty(TestElement.GUI_CLASS, TestPlanGui.class.getName());
-        testPlan.setUserDefinedVariables(( Arguments ) new ArgumentsPanel().createTestElement());
+        testPlan.setProperty( TestElement.TEST_CLASS, TestPlan.class.getName() );
+        testPlan.setProperty( TestElement.GUI_CLASS, TestPlanGui.class.getName() );
+        testPlan.setUserDefinedVariables( ( Arguments ) new ArgumentsPanel().createTestElement() );
         return testPlan;
     }
 
@@ -105,8 +110,8 @@ public class JMeterServiceImpl implements JMeterService {
     @Override
     public HTTPSamplerProxy httpSamplerProxy() {
         HTTPSamplerProxy httpSamplerProxy = new HTTPSamplerProxy();
-        httpSamplerProxy.setProperty(TestElement.TEST_CLASS, HTTPSamplerProxy.class.getName());
-        httpSamplerProxy.setProperty(TestElement.GUI_CLASS, HttpTestSampleGui.class.getName());
+        httpSamplerProxy.setProperty( TestElement.TEST_CLASS, HTTPSamplerProxy.class.getName() );
+        httpSamplerProxy.setProperty( TestElement.GUI_CLASS, HttpTestSampleGui.class.getName() );
         return httpSamplerProxy;
     }
 
@@ -123,8 +128,6 @@ public class JMeterServiceImpl implements JMeterService {
 
     @Override
     public Summariser summer() {
-        //add Summarizer output to get test progress in stdout like:
-        // summary =      2 in   1.3s =    1.5/s Avg:   631 Min:   290 Max:   973 Err:     0 (0.00%)
         String summariserName = JMeterUtils.getPropDefault( "summariser.name", "summary" );
         if( summariserName.length() > 0 ) {
             return new Summariser( summariserName );
@@ -155,5 +158,68 @@ public class JMeterServiceImpl implements JMeterService {
         catch( ConfigurationException | GenerationException e ) {
             LOGGER.log( Level.SEVERE, "Exception during generating dashboard report: {0}", e.getMessage() );
         }
+    }
+
+    @Override
+    public ResponseAssertion responseAssertion( AssertionBean assertionsBean ) {
+
+        ResponseAssertion assertion = new ResponseAssertion();
+        assertion.setProperty( TestElement.TEST_CLASS, ResponseAssertion.class.getName() );
+        assertion.setProperty( TestElement.GUI_CLASS, AssertionGui.class.getName() );
+        assertion.setName( "Response Assertion" );
+        assertion.setEnabled( true );
+
+        String testString = assertionsBean.getTestString();
+        ResponseField responseField = assertionsBean.getResponseField();
+        switch( responseField ) {
+            case TEXT:
+                assertion.setTestFieldResponseData();
+                break;
+            case DOCUMENT:
+                assertion.setTestFieldResponseDataAsDocument();
+                break;
+            case URL:
+                assertion.setTestFieldURL();
+                break;
+            case RESPONSE_CODE:
+                assertion.setTestFieldResponseCode();
+                break;
+            case RESPONSE_MESSAGE:
+                assertion.setTestFieldResponseMessage();
+                break;
+            case RESPONSE_HEADERS:
+                assertion.setTestFieldResponseHeaders();
+                break;
+            default:
+                if( LOGGER.isLoggable( Level.SEVERE ) ){
+                    LOGGER.severe( MessageFormat.format( "Unknown type ResponseField: {0}, testString: {1}", responseField, testString ) );
+                }
+                break;
+        }
+
+        ResponsePatternType responsePatternType = assertionsBean.getResponsePatternType();
+        switch( responsePatternType ) {
+            case CONTAINS:
+                assertion.setToContainsType();
+                break;
+            case MATCHES:
+                assertion.setToMatchType();
+                break;
+            case EQUALS:
+                assertion.setToEqualsType();
+                break;
+            case SUBSTRING:
+                assertion.setToSubstringType();
+                break;
+            default:
+                if( LOGGER.isLoggable( Level.SEVERE ) ){
+                    LOGGER.severe( MessageFormat.format( "Unknown type ResponsePatternType: {0}, testString: {1}", responsePatternType, testString ) );
+                }
+                break;
+        }
+
+        if( assertionsBean.isNot() ) assertion.setToNotType();
+        assertion.addTestString( testString );
+        return assertion;
     }
 }

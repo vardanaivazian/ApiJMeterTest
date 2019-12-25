@@ -2,12 +2,17 @@ package jmeter;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
+import jmeter.bean.AssertionBean;
+import jmeter.bean.AssertionsBean;
+import jmeter.bean.Endpoint;
+import jmeter.bean.Parameter;
+import jmeter.bean.Parameters;
 import jmeter.service.EndpointService;
 import jmeter.service.EndpointServiceImpl;
 import jmeter.service.JMeterService;
 import jmeter.service.JMeterServiceImpl;
 import jmeter.service.PropertyService;
+import org.apache.jmeter.assertions.ResponseAssertion;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
@@ -36,23 +41,40 @@ public class JMeterTest {
         TestPlan testPlan = jMeterService.testPlan( "Create JMeter Script From Java Code" );
 
         HashTree testPlanTree = jMeterService.testPlanTree();
-
-        // Construct Test Plan from previously initialized elements
+        
         testPlanTree.add( testPlan );
 
         HashTree threadGroupHashTree = testPlanTree.add( testPlan, threadGroup );
 
-        Stream<HTTPSamplerProxy> httpSamplerProxyStream = endpointService.getEndpoints().stream().map( endpoint -> {
+        for( Endpoint endpoint : endpointService.getEndpoints() ) {
+            
             HTTPSamplerProxy httpSampler = jMeterService.httpSamplerProxy();
+            httpSampler.setConnectTimeout(endpoint.getConnectTimeout() == null ? PROP.get( "test.default.connectTimeout" ) : endpoint.getConnectTimeout());
+            httpSampler.setResponseTimeout(endpoint.getResponseTimeout() == null ? PROP.get( "test.default.responseTimeout" ) : endpoint.getResponseTimeout());
             httpSampler.setName( endpoint.getId() == null ? endpoint.getPath() : endpoint.getId() );
             httpSampler.setDomain( endpoint.getDomain() );
             httpSampler.setPort( endpoint.getPort() );
             httpSampler.setPath( endpoint.getPath() );
             httpSampler.setMethod( endpoint.getMethod() );
-            return httpSampler;
-        } );
-        
-        threadGroupHashTree.add( httpSamplerProxyStream.toArray() );
+            Parameters params = endpoint.getParams();
+
+            if( params != null ) {
+                for( Parameter param : params.getParams() ) {
+                    httpSampler.addArgument( param.getName(), param.getValue() );
+                }
+            }
+            
+
+            HashTree samplerHashTree = threadGroupHashTree.add( httpSampler );
+            AssertionsBean endpointAssertions = endpoint.getAssertions();
+            
+            if( endpointAssertions != null ) {
+                for( AssertionBean assertionBean : endpointAssertions.getAssertions() ) {
+                    ResponseAssertion assertion = jMeterService.responseAssertion(assertionBean);
+                    samplerHashTree.add(assertion);
+                }                
+            }
+        }
         
         //save jmx script
         jMeterService.saveTree( testPlanTree, PROP.get( "test.script.location" ) );

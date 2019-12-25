@@ -1,5 +1,7 @@
 package jmeter.service;
 
+import jmeter.bean.AssertionBean;
+import org.apache.jmeter.assertions.ResponseAssertion;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
@@ -22,4 +24,5 @@ public interface JMeterService {
     ResultCollector resultCollector( Summariser summer, String reportFile);
     void addReport(HashTree testPlanTree, Summariser summer, String reportFile);
     void generateDashboardReport(String source, String destination);
+    ResponseAssertion responseAssertion( AssertionBean assertionsBean );
 }
