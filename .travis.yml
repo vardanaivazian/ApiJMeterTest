@@ -1,0 +1,18 @@
+language: java
+jdk: oraclejdk8
+
+install: true
+script: mvn clean install
+
+cache:
+  directories:
+  - $HOME/.m2
+
+
+notifications:
+  email:
+    recipients:
+    - vardan27a@gmail.com
+    - nadrav27@gmail.com
+    on_success: always # default: change (change, never, always)
+    on_failure: always # default: always
