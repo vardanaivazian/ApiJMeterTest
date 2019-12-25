@@ -44,7 +44,7 @@ public class JMeterTest {
 
         Stream<HTTPSamplerProxy> httpSamplerProxyStream = endpointService.getEndpoints().stream().map( endpoint -> {
             HTTPSamplerProxy httpSampler = jMeterService.httpSamplerProxy();
-            httpSampler.setName( endpoint.getPath() );
+            httpSampler.setName( endpoint.getId() == null ? endpoint.getPath() : endpoint.getId() );
             httpSampler.setDomain( endpoint.getDomain() );
             httpSampler.setPort( endpoint.getPort() );
             httpSampler.setPath( endpoint.getPath() );

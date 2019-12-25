@@ -1,30 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <endpoints>
 
-    <endpoint>
-        <domain>jsonplaceholder.typicode.com</domain>
-        <port>80</port>
-        <path>/posts</path>
-        <method>GET</method>
-    </endpoint>
-    <endpoint>
+    <endpoint id="111">
         <domain>jsonplaceholder.typicode.com</domain>
         <port>80</port>
         <path>/posts/1</path>
         <method>GET</method>
     </endpoint>
     
-    <endpoint>
+    <endpoint id="222">
         <domain>jsonplaceholder.typicode.com</domain>
         <port>80</port>
         <path>/posts</path>
         <method>POST</method>
     </endpoint>
-    <endpoint>
+
+    <endpoint id="333">
         <domain>jsonplaceholder.typicode.com</domain>
         <port>80</port>
-        <path>/posts/1</path>
-        <method>PUT</method>
+        <path>/posts</path>
+        <method>GET</method>
+    </endpoint>
+
+    <endpoint id="444">
+        <domain>jsonplaceholder.typicode.com</domain>
+        <port>80</port>
+        <path>/posts</path>
+        <params>
+            <param name="title" value="foo"/>
+            <param name="body" value="bar"/>
+            <param name="userId" value="1"/>
+        </params>
+        <method>POST</method>
     </endpoint>
     
 </endpoints>

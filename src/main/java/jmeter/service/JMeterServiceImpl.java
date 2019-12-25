@@ -1,8 +1,13 @@
 package jmeter.service;
 
 import jmeter.exception.AppException;
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.config.gui.ArgumentsPanel;
 import org.apache.jmeter.control.LoopController;
+import org.apache.jmeter.control.gui.LoopControlPanel;
+import org.apache.jmeter.control.gui.TestPlanGui;
 import org.apache.jmeter.engine.StandardJMeterEngine;
+import org.apache.jmeter.protocol.http.control.gui.HttpTestSampleGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
 import org.apache.jmeter.report.config.ConfigurationException;
 import org.apache.jmeter.report.dashboard.GenerationException;
@@ -10,8 +15,10 @@ import org.apache.jmeter.report.dashboard.ReportGenerator;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.reporters.Summariser;
 import org.apache.jmeter.save.SaveService;
+import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jmeter.threads.gui.ThreadGroupGui;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 
@@ -54,7 +61,7 @@ public class JMeterServiceImpl implements JMeterService {
     @Override
     public void run( StandardJMeterEngine engine, HashTree testPlanTree ) {
         engine.configure( testPlanTree );
-        LOGGER.info( "Running test plan " + testPlanTree.getArray()[0]);
+        LOGGER.info( "Running test plan " + testPlanTree.getArray()[0] );
         engine.run();
     }
 
@@ -65,6 +72,8 @@ public class JMeterServiceImpl implements JMeterService {
         loopController.setLoops( loopCount );
         loopController.setFirst( first );
         loopController.initialize();
+        loopController.setProperty(TestElement.TEST_CLASS, LoopController.class.getName());
+        loopController.setProperty(TestElement.GUI_CLASS, LoopControlPanel.class.getName());
         return loopController;
     }
 
@@ -74,12 +83,18 @@ public class JMeterServiceImpl implements JMeterService {
         threadGroup.setName( name );
         threadGroup.setNumThreads( numThreads );
         threadGroup.setRampUp( rumpUp );
+        threadGroup.setProperty(TestElement.TEST_CLASS, ThreadGroup.class.getName());
+        threadGroup.setProperty(TestElement.GUI_CLASS, ThreadGroupGui.class.getName());
         return threadGroup;
     }
 
     @Override
     public TestPlan testPlan( String name ) {
-        return new TestPlan( name );
+        TestPlan testPlan = new TestPlan( name );
+        testPlan.setProperty(TestElement.TEST_CLASS, TestPlan.class.getName());
+        testPlan.setProperty(TestElement.GUI_CLASS, TestPlanGui.class.getName());
+        testPlan.setUserDefinedVariables(( Arguments ) new ArgumentsPanel().createTestElement());
+        return testPlan;
     }
 
     @Override
@@ -89,7 +104,10 @@ public class JMeterServiceImpl implements JMeterService {
 
     @Override
     public HTTPSamplerProxy httpSamplerProxy() {
-        return new HTTPSamplerProxy();
+        HTTPSamplerProxy httpSamplerProxy = new HTTPSamplerProxy();
+        httpSamplerProxy.setProperty(TestElement.TEST_CLASS, HTTPSamplerProxy.class.getName());
+        httpSamplerProxy.setProperty(TestElement.GUI_CLASS, HttpTestSampleGui.class.getName());
+        return httpSamplerProxy;
     }
 
     @Override
@@ -116,7 +134,7 @@ public class JMeterServiceImpl implements JMeterService {
 
     @Override
     public ResultCollector resultCollector( Summariser summer, String reportFile ) {
-        ResultCollector report = new ResultCollector( summer );
+        ResultCollector report = new CustomResultCollector( summer );
         report.setFilename( reportFile );
         return report;
     }
