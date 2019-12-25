@@ -29,16 +29,9 @@ public class CustomResultCollector extends ResultCollector {
         super.sampleOccurred( event );
         SampleResult sampleResult = event.getResult();
         if( sampleResult.isSuccessful() ) {
-            LOGGER.log( Level.INFO,"result: {0}", sampleResult );
-            LOGGER.log(Level.INFO, "Response time in milliseconds: {0}", sampleResult.getTime() );
-
-            Endpoint endpoint = endpointService.findEndpoint( sampleResult.getSampleLabel() ); // found endpoint by id 
-
-            if( endpoint == null ) {
-                LOGGER.log( Level.SEVERE, "Endpoint not fount by id: {0}", sampleResult.getSampleLabel() );
-            }
-
-            LOGGER.info( "HttpSample success id: " + sampleResult.getSampleLabel() + ", responseCode: " + sampleResult.getResponseCode() + ", responseMessage: " + sampleResult.getResponseMessage() );
+            LOGGER.log( Level.INFO, "result: {0}", sampleResult );
+            LOGGER.log( Level.INFO, "Response time in milliseconds: {0}", sampleResult.getTime() );
+            LOGGER.log( Level.INFO, "HttpSample success id: " + sampleResult.getSampleLabel() + ", responseCode: " + sampleResult.getResponseCode() + ", responseMessage: " + sampleResult.getResponseMessage() );
         }
         else {
             LOGGER.warning( "HttpSample failed id: " + sampleResult.getSampleLabel() + ", responseCode: " + sampleResult.getResponseCode() + ", responseMessage: " + sampleResult.getResponseMessage() );
