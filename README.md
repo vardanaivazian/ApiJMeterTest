@@ -18,5 +18,21 @@ Here's how to build a JMeter Test Plan from scratch using Java code only.
     * `test.numThreads`         it represents the total number of virtual users performing the test script execution.
     * `test.loops`              is the number of executions for the script.
 
-* Endpoints are described as xml file ([endpoints.xml](src/main/resources/endpoints.xml)) and parsed to java beans using [JAXB](https://javaee.github.io/jaxb-v2/) lib
+* Endpoints are described as xml file ([endpoints.xml](src/main/resources/endpoints.xml)) in [config.properties](src/main/resources/config.properties) and parsed to java beans using [JAXB](https://javaee.github.io/jaxb-v2/) lib
+    > example 
+   ```xml
+   <endpoint id="444">
+      <domain>jsonplaceholder.typicode.com</domain>
+          <port>80</port>
+          <path>/posts</path>
+          <params>
+              <param name="title" value="foo"/>
+              <param name="body" value="bar"/>
+              <param name="userId" value="1"/>
+           </params>
+       <method>POST</method>
+   </endpoint>
+   ```
 * Deploying an Executable Test JAR File -> `$ mvn package`
+
+> __note:__ Initially a JMeter must be installed and added `jmeter.home` full path in to [config.properties](src/main/resources/config.properties)
