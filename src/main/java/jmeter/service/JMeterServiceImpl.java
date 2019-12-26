@@ -183,52 +183,22 @@ public class JMeterServiceImpl implements JMeterService {
     }
 
     private void setResponseField( ResponseField responseField, ResponseAssertion assertion ) {
-        switch( responseField ) {
-            case TEXT:
-                assertion.setTestFieldResponseData();
-                break;
-            case DOCUMENT:
-                assertion.setTestFieldResponseDataAsDocument();
-                break;
-            case URL:
-                assertion.setTestFieldURL();
-                break;
-            case RESPONSE_CODE:
-                assertion.setTestFieldResponseCode();
-                break;
-            case RESPONSE_MESSAGE:
-                assertion.setTestFieldResponseMessage();
-                break;
-            case RESPONSE_HEADERS:
-                assertion.setTestFieldResponseHeaders();
-                break;
-            default:
-                if( LOGGER.isLoggable( Level.SEVERE ) ) {
-                    LOGGER.log( Level.SEVERE, "Unknown type ResponseField: {0}", responseField );
-                }
-                break;
+        
+        UtilService.ResponseFieldProcessor responseFieldProcessor = UtilService.getResponseFieldProcessors().get( responseField );
+        if (responseFieldProcessor == null) {
+            throw new AppException("Unknown responseFieldProcessor for responseField " + responseField);
         }
+        // set responseField type to assertion
+        responseFieldProcessor.processResponseField(assertion);
     }
 
     private void setResponsePatternType( ResponsePatternType responsePatternType, ResponseAssertion assertion ) {
-        switch( responsePatternType ) {
-            case CONTAINS:
-                assertion.setToContainsType();
-                break;
-            case MATCHES:
-                assertion.setToMatchType();
-                break;
-            case EQUALS:
-                assertion.setToEqualsType();
-                break;
-            case SUBSTRING:
-                assertion.setToSubstringType();
-                break;
-            default:
-                if( LOGGER.isLoggable( Level.SEVERE ) ) {
-                    LOGGER.log( Level.SEVERE, "Unknown type ResponsePatternType: {0}", responsePatternType );
-                }
-                break;
+
+        UtilService.ResponsePatternTypeProcessor responsePatternTypeProcessor = UtilService.getResponsePatternTypeProcessors().get( responsePatternType );
+        if( responsePatternTypeProcessor == null ) {
+            throw new AppException("Unknown responsePatternTypeProcessor for responsePatternType " + responsePatternType);
         }
+        // set responsePatternType to assertion
+        responsePatternTypeProcessor.processResponsePatternType( assertion );
     }
 }
