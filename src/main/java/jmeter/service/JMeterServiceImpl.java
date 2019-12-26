@@ -170,7 +170,19 @@ public class JMeterServiceImpl implements JMeterService {
         assertion.setEnabled( true );
 
         String testString = assertionsBean.getTestString();
-        ResponseField responseField = assertionsBean.getResponseField();
+
+        LOGGER.log( Level.INFO, "Add response assertion for {0}", testString );
+
+        setResponseField( assertionsBean.getResponseField(), assertion );
+
+        setResponsePatternType( assertionsBean.getResponsePatternType(), assertion );
+
+        if( assertionsBean.isNot() ) assertion.setToNotType();
+        assertion.addTestString( testString );
+        return assertion;
+    }
+
+    private void setResponseField( ResponseField responseField, ResponseAssertion assertion ) {
         switch( responseField ) {
             case TEXT:
                 assertion.setTestFieldResponseData();
@@ -191,13 +203,14 @@ public class JMeterServiceImpl implements JMeterService {
                 assertion.setTestFieldResponseHeaders();
                 break;
             default:
-                if( LOGGER.isLoggable( Level.SEVERE ) ){
-                    LOGGER.severe( MessageFormat.format( "Unknown type ResponseField: {0}, testString: {1}", responseField, testString ) );
+                if( LOGGER.isLoggable( Level.SEVERE ) ) {
+                    LOGGER.log( Level.SEVERE, "Unknown type ResponseField: {0}", responseField );
                 }
                 break;
         }
+    }
 
-        ResponsePatternType responsePatternType = assertionsBean.getResponsePatternType();
+    private void setResponsePatternType( ResponsePatternType responsePatternType, ResponseAssertion assertion ) {
         switch( responsePatternType ) {
             case CONTAINS:
                 assertion.setToContainsType();
@@ -212,14 +225,10 @@ public class JMeterServiceImpl implements JMeterService {
                 assertion.setToSubstringType();
                 break;
             default:
-                if( LOGGER.isLoggable( Level.SEVERE ) ){
-                    LOGGER.severe( MessageFormat.format( "Unknown type ResponsePatternType: {0}, testString: {1}", responsePatternType, testString ) );
+                if( LOGGER.isLoggable( Level.SEVERE ) ) {
+                    LOGGER.log( Level.SEVERE, "Unknown type ResponsePatternType: {0}", responsePatternType );
                 }
                 break;
         }
-
-        if( assertionsBean.isNot() ) assertion.setToNotType();
-        assertion.addTestString( testString );
-        return assertion;
     }
 }
