@@ -22,9 +22,10 @@ public final class UtilService {
     private static EnumMap<ResponseField, ResponseFieldProcessor> responseFieldProcessors;
     private static EnumMap<ResponsePatternType, ResponsePatternTypeProcessor> responsePatternTypeProcessors;
 
-    private UtilService() {}
+    private UtilService() {
+    }
 
-    public static void addSamplersToTree( HashTree threadGroupHashTree) {
+    public static void addSamplersToTree( HashTree threadGroupHashTree ) {
 
         for( Endpoint endpoint : endpointService.getEndpoints() ) {
 
@@ -35,8 +36,8 @@ public final class UtilService {
 
             if( endpointAssertions != null ) {
                 for( AssertionBean assertionBean : endpointAssertions.getAssertions() ) {
-                    ResponseAssertion assertion = jMeterService.responseAssertion(assertionBean);
-                    samplerHashTree.add(assertion);
+                    ResponseAssertion assertion = jMeterService.responseAssertion( assertionBean );
+                    samplerHashTree.add( assertion );
                 }
             }
         }
@@ -44,12 +45,12 @@ public final class UtilService {
 
 
     interface ResponseFieldProcessor {
-        void processResponseField(ResponseAssertion assertion);
+        void processResponseField( ResponseAssertion assertion );
     }
 
     public static Map<ResponseField, ResponseFieldProcessor> getResponseFieldProcessors() {
         if( responseFieldProcessors == null ) {
-            responseFieldProcessors = new EnumMap<>(ResponseField.class);
+            responseFieldProcessors = new EnumMap<>( ResponseField.class );
             responseFieldProcessors.put( ResponseField.TEXT, ResponseAssertion::setTestFieldResponseData );
             responseFieldProcessors.put( ResponseField.DOCUMENT, ResponseAssertion::setTestFieldResponseDataAsDocument );
             responseFieldProcessors.put( ResponseField.URL, ResponseAssertion::setTestFieldURL );
@@ -59,11 +60,11 @@ public final class UtilService {
         }
         return responseFieldProcessors;
     }
-    
+
     interface ResponsePatternTypeProcessor {
-        void processResponsePatternType(ResponseAssertion assertion);
+        void processResponsePatternType( ResponseAssertion assertion );
     }
-    
+
     public static Map<ResponsePatternType, ResponsePatternTypeProcessor> getResponsePatternTypeProcessors() {
         if( responsePatternTypeProcessors == null ) {
             responsePatternTypeProcessors = new EnumMap<>( ResponsePatternType.class );
@@ -75,12 +76,12 @@ public final class UtilService {
         return responsePatternTypeProcessors;
     }
 
-    private static HTTPSamplerProxy getHttpSamplerFromEndpoint( Endpoint endpoint) {
+    private static HTTPSamplerProxy getHttpSamplerFromEndpoint( Endpoint endpoint ) {
 
         HTTPSamplerProxy httpSampler = jMeterService.httpSamplerProxy();
-        httpSampler.setConnectTimeout(endpoint.getConnectTimeout() == null ? PROP.get( "test.default.connectTimeout" ) : endpoint.getConnectTimeout());
-        httpSampler.setResponseTimeout(endpoint.getResponseTimeout() == null ? PROP.get( "test.default.responseTimeout" ) : endpoint.getResponseTimeout());
-        httpSampler.setName( endpoint.getId() == null ? endpoint.getPath() : endpoint.getId() );
+        httpSampler.setConnectTimeout( getEndpointConnectTimeout( endpoint ) );
+        httpSampler.setResponseTimeout( getEndpointResponseTimeout( endpoint ) );
+        httpSampler.setName( getEndpointName( endpoint ) );
         httpSampler.setDomain( endpoint.getDomain() );
         httpSampler.setPort( endpoint.getPort() );
         httpSampler.setPath( endpoint.getPath() );
@@ -94,5 +95,17 @@ public final class UtilService {
         }
         return httpSampler;
     }
+
+    private static String getEndpointConnectTimeout(Endpoint endpoint) {
+        return endpoint.getConnectTimeout() == null ? PROP.get( "test.default.connectTimeout" ) : endpoint.getConnectTimeout();
+    }
     
+    private static String getEndpointResponseTimeout(Endpoint endpoint) {
+        return endpoint.getResponseTimeout() == null ? PROP.get( "test.default.responseTimeout" ) : endpoint.getResponseTimeout();
+    }
+    
+    private static String getEndpointName(Endpoint endpoint) {
+        return endpoint.getId() == null ? endpoint.getPath() : endpoint.getId();
+    }
+
 }
