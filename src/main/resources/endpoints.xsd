@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="domain" type="xs:string"/>
+    <xs:element name="port" type="xs:string"/>
+    <xs:element name="path" type="xs:string"/>
+    <xs:element name="method" type="xs:string"/>
+    <xs:element name="testString" type="xs:string"/>
+    
+    <xs:element name="responseField" type="xs:string">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="TEXT"/>
+                <xs:enumeration value="RESPONSE_CODE"/>
+                <xs:enumeration value="RESPONSE_MESSAGE"/>
+                <xs:enumeration value="RESPONSE_HEADERS"/>
+                <xs:enumeration value="URL"/>
+                <xs:enumeration value="DOCUMENT"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:element>
+    
+    <xs:element name="responsePatternType" type="xs:string">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="CONTAINS"/>
+                <xs:enumeration value="MATCHES"/>
+                <xs:enumeration value="EQUALS"/>
+                <xs:enumeration value="SUBSTRING"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:element>
+    
+    <xs:element name="not" type="xs:string"/>
+
+    <xs:element name="endpoints">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="endpoint" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="endpoint">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="domain"/>
+                <xs:element ref="port" minOccurs="0"/>
+                <xs:element ref="path"/>
+                <xs:element ref="params" minOccurs="0"/>
+                <xs:element ref="method"/>
+                <xs:element ref="assertions" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string"/>
+            <xs:attribute name="connectTimeout" type="xs:string"/>
+            <xs:attribute name="responseTimeout" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="params">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="param" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="param">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="assertions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="assertion"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="assertion">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="testString"/>
+                <xs:element ref="responseField"/>
+                <xs:element ref="responsePatternType"/>
+                <xs:element ref="not"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
